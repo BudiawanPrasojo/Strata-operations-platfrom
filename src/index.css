@@ -1,0 +1,341 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Variables ─────────────────────────────────────── */
+:root {
+  --bg-base:       #080A0C;
+  --bg-surface:    #0C0F12;
+  --bg-elevated:   #111418;
+  --bg-panel:      #0F1520;
+
+  --border-hard:   #1E2A35;
+  --border-mid:    #162028;
+  --border-soft:   #0F1820;
+
+  --ink-primary:   #E8EDF2;
+  --ink-secondary: #8A9BB0;
+  --ink-muted:     #3D5068;
+  --ink-ghost:     #243040;
+
+  --orange:        #E8600A;
+  --orange-dim:    rgba(232,96,10,0.12);
+  --orange-edge:   rgba(232,96,10,0.25);
+
+  --amber:         #F59E0B;
+  --amber-dim:     rgba(245,158,11,0.10);
+  --amber-edge:    rgba(245,158,11,0.22);
+
+  --cyan:          #06B6D4;
+  --cyan-dim:      rgba(6,182,212,0.08);
+  --cyan-edge:     rgba(6,182,212,0.18);
+
+  --ok:            #22C55E;
+  --warn:          #F59E0B;
+  --alert:         #EF4444;
+
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* ── Base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 14px; }
+
+body {
+  background: var(--bg-base);
+  color: var(--ink-primary);
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Mono for all numbers */
+.num { font-family: var(--font-mono); }
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-hard);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
+
+/* ── Panels ────────────────────────────────────────────── */
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hard);
+}
+
+.panel-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-hard);
+}
+
+/* ── Status left-border pattern ───────────────────────── */
+.status-bar-ok    { border-left: 3px solid var(--ok); }
+.status-bar-warn  { border-left: 3px solid var(--warn); }
+.status-bar-alert { border-left: 3px solid var(--alert); }
+.status-bar-amber { border-left: 3px solid var(--amber); }
+.status-bar-cyan  { border-left: 3px solid var(--cyan); }
+
+/* ── Section header ────────────────────────────────────── */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.section-label__bar {
+  width: 3px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+.section-label__text {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.section-label__line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-hard), transparent);
+}
+
+/* ── KPI value ─────────────────────────────────────────── */
+.kpi-value {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-primary);
+  line-height: 1;
+}
+
+/* ── Badge ─────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+.badge-ok    { background: rgba(34,197,94,0.10);  color: var(--ok);    border: 1px solid rgba(34,197,94,0.20); }
+.badge-warn  { background: rgba(245,158,11,0.10); color: var(--warn);  border: 1px solid rgba(245,158,11,0.20); }
+.badge-alert { background: rgba(239,68,68,0.10);  color: var(--alert); border: 1px solid rgba(239,68,68,0.20); }
+.badge-amber { background: var(--amber-dim);      color: var(--amber); border: 1px solid var(--amber-edge); }
+.badge-cyan  { background: var(--cyan-dim);       color: var(--cyan);  border: 1px solid var(--cyan-edge); }
+.badge-ghost { background: rgba(255,255,255,0.04); color: var(--ink-secondary); border: 1px solid var(--border-hard); }
+
+/* ── Grid line background ──────────────────────────────── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Animations ────────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes bar-fill {
+  from { width: 0; }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-pulse-dot  { animation: pulse-dot 2s ease-in-out infinite; }
+.animate-blink      { animation: blink 1.2s step-end infinite; }
+.animate-fade-up    { animation: fade-up 0.3s ease both; }
+.animate-slide-in   { animation: slide-in-right 0.25s ease both; }
+
+/* ── Live dot ──────────────────────────────────────────── */
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ── Divider ───────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border-hard);
+  margin: 16px 0;
+}
+
+/* ── Hover row ─────────────────────────────────────────── */
+.hover-row {
+  transition: background 0.15s;
+}
+.hover-row:hover {
+  background: rgba(255,255,255,0.025);
+}
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN — #13
+   All layout helpers use CSS classes so they can respond
+   to breakpoints without touching component logic.
+   ════════════════════════════════════════════════════════ */
+
+/* ── Layout wrapper ─────────────────────────────────────── */
+/* Desktop: push content right of the sidebar.
+   Mobile:  full-width — sidebar overlays as a drawer. */
+.layout-main {
+  margin-left: var(--sidebar-w, 52px);
+  transition: margin-left 0.2s;
+}
+@media (max-width: 1023px) {
+  .layout-main {
+    margin-left: 0 !important;
+  }
+}
+
+/* ── Main content padding ────────────────────────────────── */
+.layout-content {
+  padding: 16px;
+}
+@media (min-width: 768px) {
+  .layout-content {
+    padding: 20px 24px;
+  }
+}
+
+/* ── Page header (title + badge row) ────────────────────── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── TopNavbar — hide verbose elements on mobile ─────────── */
+@media (max-width: 767px) {
+  .navbar-search { display: none !important; }
+  .navbar-clock  { display: none !important; }
+}
+
+/* ── Responsive grid helpers ─────────────────────────────── */
+
+/* 2 equal cols on md+, single col on mobile */
+.responsive-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .responsive-grid-2col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Main content + fixed sidebar col (e.g. feed + alerts) */
+.responsive-grid-sidebar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 1024px) {
+  .responsive-grid-sidebar {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+/* 4-col stat bar: 2 cols on mobile, 4 on md+ */
+.responsive-grid-4col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (min-width: 768px) {
+  .responsive-grid-4col {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ── Scrollable table wrapper ────────────────────────────── */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Equipment detail panel ──────────────────────────────── */
+/* Full-width on mobile, fixed 380px on larger screens */
+.detail-panel {
+  width: 100%;
+}
+@media (min-width: 480px) {
+  .detail-panel {
+    width: 380px;
+  }
+}
+
+/* ── Analytics grid fixes ────────────────────────────────── */
+/* The 2-col summary cards row uses grid-cols-2 which is fine,
+   but chart containers need a min-height guard on small screens */
+@media (max-width: 639px) {
+  /* Prevent chart containers from being zero-height on mobile */
+  .h-52 { height: 160px !important; }
+  .h-64 { height: 180px !important; }
+  .h-72 { height: 200px !important; }
+}
+
+/* 3-col grid: single col on mobile, 3 on md+ */
+.responsive-grid-3col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+@media (min-width: 640px) {
+  .responsive-grid-3col {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ── Sidebar backdrop (already exists but ensure z-index) ── */
+@media (min-width: 1024px) {
+  /* On desktop, overlay backdrop should never show */
+  .sidebar-backdrop { display: none !important; }
+}
+
+/* ── Sidebar mobile behaviour ─────────────────────────────── */
+/* On mobile (< lg): collapsed sidebar hides completely (width 0).
+   On desktop (>= lg): inline style controls 52px / 216px as before. */
+@media (max-width: 1023px) {
+  .strata-sidebar.sidebar-collapsed {
+    width: 0 !important;
+    border-right: none !important;
+  }
+  .strata-sidebar.sidebar-open {
+    width: 216px !important;
+  }
+}

@@ -1,4 +1,4 @@
-export default function SMOPLogo({ collapsed = false }) {
+export default function STRATALogo({ collapsed = false }) {
   return (
     <div className="flex items-center gap-3">
       <div className="relative flex-shrink-0">

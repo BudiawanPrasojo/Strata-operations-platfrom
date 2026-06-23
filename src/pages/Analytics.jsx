@@ -71,7 +71,7 @@ export default function Analytics() {
         Metric: 'Equipment Utilization (%)', Period: label, Value: equipmentUtilization.values[i],
       })),
     ];
-    exportToCSV(rows, `smop-analytics-${selectedDays}d`);
+    exportToCSV(rows, `strata-analytics-${selectedDays}d`);
   };
 
   const currentRange = DATE_RANGES.find(r => r.days === selectedDays);

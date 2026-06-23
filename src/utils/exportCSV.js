@@ -63,7 +63,7 @@ export function exportEquipmentCSV(data) {
     'Maintenance':  u.maintenance,
     'Last Service': u.lastService,
   }));
-  exportToCSV(mapped, 'smop-equipment');
+  exportToCSV(mapped, 'strata-equipment');
 }
 
 // Helper khusus events
@@ -78,5 +78,5 @@ export function exportEventsCSV(data) {
     'Unit ID':   e.unit_id || '-',
     'Operator':  e.operator || '-',
   }));
-  exportToCSV(mapped, 'smop-events');
+  exportToCSV(mapped, 'strata-events');
 }

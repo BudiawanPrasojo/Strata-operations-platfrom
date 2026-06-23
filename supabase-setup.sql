@@ -1,5 +1,5 @@
 -- ============================================================
--- Smart Mining Operations Platform — Supabase Setup
+-- STRATA (Smart Tactical Resource & Analytics Platform) — Supabase Setup
 -- ============================================================
 -- Jalankan file ini di: Supabase → SQL Editor → New Query
 -- Jalankan SATU BLOK sekaligus, cek hasilnya, baru lanjut
@@ -127,3 +127,112 @@ SELECT 'equipment', COUNT(*) FROM equipment;
 -- Hasil yang diharapkan:
 -- operational_events | 20
 -- equipment          | 10
+
+
+-- ============================================================
+-- SPRINT 3 — BLOK 7: Tabel fuel_metrics
+-- ============================================================
+-- Dibutuhkan oleh:
+--   - src/hooks/useFuel.js              (fetch dari tabel ini)
+--   - src/hooks/useAnalytics.js         (fuel_consumption, fuel_efficiency)
+--   - src/components/dashboard/KPIThresholdAlertPanel.jsx
+-- Tabel ini belum ada di setup Sprint 1/2.
+-- Tidak mengubah tabel existing.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS fuel_metrics (
+  id               BIGSERIAL PRIMARY KEY,
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  timestamp        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  site             TEXT NOT NULL,
+  fuel_consumption NUMERIC(10, 2),  -- liter
+  fuel_efficiency  NUMERIC(5, 2),   -- persen (0–100)
+  fuel_cost        NUMERIC(12, 2),  -- nilai moneter
+  status           TEXT CHECK (status IN ('Normal', 'Investigating', 'Critical', 'Resolved'))
+);
+
+-- Index untuk query time-range (useAnalytics pakai .gte('timestamp', since))
+CREATE INDEX IF NOT EXISTS idx_fuel_metrics_timestamp ON fuel_metrics (timestamp DESC);
+
+-- RLS: baca publik, tulis terlindungi
+ALTER TABLE fuel_metrics ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "allow_read_fuel_metrics"
+  ON fuel_metrics FOR SELECT
+  USING (true);
+
+-- Seed data realistis (10 rows)
+INSERT INTO fuel_metrics (timestamp, site, fuel_consumption, fuel_efficiency, fuel_cost, status) VALUES
+(NOW() - INTERVAL '0 days',  'Sector A',  8423, 86.5, 4211500, 'Normal'),
+(NOW() - INTERVAL '1 days',  'Sector B',  7980, 83.2, 3990000, 'Normal'),
+(NOW() - INTERVAL '1 days',  'Sector A',  9100, 67.4, 4550000, 'Investigating'),
+(NOW() - INTERVAL '2 days',  'Sector C',  8750, 81.0, 4375000, 'Normal'),
+(NOW() - INTERVAL '2 days',  'Sector B',  6800, 79.5, 3400000, 'Normal'),
+(NOW() - INTERVAL '3 days',  'Sector D',  9200, 88.1, 4600000, 'Normal'),
+(NOW() - INTERVAL '3 days',  'Sector A',  8100, 65.0, 4050000, 'Critical'),
+(NOW() - INTERVAL '4 days',  'Sector C',  7600, 82.3, 3800000, 'Normal'),
+(NOW() - INTERVAL '5 days',  'Sector B',  8900, 84.7, 4450000, 'Normal'),
+(NOW() - INTERVAL '6 days',  'Sector D',  7200, 78.9, 3600000, 'Normal');
+
+
+-- ============================================================
+-- SPRINT 3 — BLOK 8: Tabel safety_incidents
+-- ============================================================
+-- Dibutuhkan oleh:
+--   - src/hooks/useSafety.js            (fetch dari tabel ini)
+--   - src/components/dashboard/KPIThresholdAlertPanel.jsx
+--   - src/pages/ShiftHandover.jsx
+-- Tabel ini belum ada di setup Sprint 1/2.
+-- Tidak mengubah tabel existing.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS safety_incidents (
+  id            BIGSERIAL PRIMARY KEY,
+  created_at    TIMESTAMPTZ DEFAULT NOW(),
+  incident_type TEXT NOT NULL,
+  severity      TEXT NOT NULL CHECK (severity IN ('info', 'warning', 'danger', 'critical', 'high')),
+  location      TEXT,
+  status        TEXT CHECK (status IN ('Open', 'Under Review', 'Resolved', 'Closed')) DEFAULT 'Open'
+);
+
+-- Index untuk query terbaru (useSafety pakai .order('created_at', desc).limit(30))
+CREATE INDEX IF NOT EXISTS idx_safety_incidents_created ON safety_incidents (created_at DESC);
+
+-- RLS: baca publik
+ALTER TABLE safety_incidents ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "allow_read_safety_incidents"
+  ON safety_incidents FOR SELECT
+  USING (true);
+
+-- Seed data realistis (10 rows)
+INSERT INTO safety_incidents (created_at, incident_type, severity, location, status) VALUES
+(NOW() - INTERVAL '0 days',  'Near Miss',           'warning', 'Sector C',  'Open'),
+(NOW() - INTERVAL '1 days',  'Equipment Failure',   'danger',  'Sector A',  'Under Review'),
+(NOW() - INTERVAL '2 days',  'Fuel Spill',          'warning', 'Depot B',   'Under Review'),
+(NOW() - INTERVAL '3 days',  'Fatigue Alert',       'warning', 'Sector B',  'Resolved'),
+(NOW() - INTERVAL '4 days',  'Unauthorized Access', 'info',    'Workshop',  'Closed'),
+(NOW() - INTERVAL '5 days',  'Blasting Incident',   'critical','Sector D',  'Under Review'),
+(NOW() - INTERVAL '6 days',  'Medical Emergency',   'danger',  'Sector A',  'Resolved'),
+(NOW() - INTERVAL '7 days',  'Road Hazard',         'warning', 'Route Beta','Closed'),
+(NOW() - INTERVAL '10 days', 'Near Miss',           'warning', 'Sector B',  'Closed'),
+(NOW() - INTERVAL '14 days', 'Equipment Failure',   'high',    'Sector C',  'Resolved');
+
+
+-- ============================================================
+-- SPRINT 3 — BLOK 9: Verifikasi semua tabel
+-- ============================================================
+
+SELECT 'operational_events' AS table_name, COUNT(*) AS row_count FROM operational_events
+UNION ALL
+SELECT 'equipment',         COUNT(*) FROM equipment
+UNION ALL
+SELECT 'fuel_metrics',      COUNT(*) FROM fuel_metrics
+UNION ALL
+SELECT 'safety_incidents',  COUNT(*) FROM safety_incidents;
+
+-- Hasil yang diharapkan:
+-- operational_events | 20
+-- equipment          | 10
+-- fuel_metrics       | 10
+-- safety_incidents   | 10

@@ -26,6 +26,7 @@ import { useFuel }              from '../hooks/useFuel';
 import { useSafety }            from '../hooks/useSafety';
 import { useOperationalEvents } from '../hooks/useOperationalEvents';
 import { operationsData }       from '../data/mockData';
+import { evaluateThresholds }   from '../utils/thresholds';
 
 import LoadingSkeleton from '../components/common/LoadingSkeleton';
 import ErrorState      from '../components/common/ErrorState';
@@ -37,59 +38,7 @@ const SEV = {
   MEDIUM:   { color: '#f59e0b', bg: 'rgba(245,158,11,0.07)', border: 'rgba(245,158,11,0.22)', badge: 'badge-warn',  icon: AlertCircle,    rank: 1 },
 };
 
-// ── KPI threshold evaluation (same logic as KPIThresholdAlertPanel) ───────────
-function evaluateThresholds(equipment, fuelMetrics, incidents, events) {
-  const alerts = [];
-
-  (equipment || []).forEach(eq => {
-    const h = eq.health ?? 100;
-    if (h < 50) {
-      alerts.push({ id: `eq-crit-${eq.id}`, severity: 'CRITICAL', category: 'Equipment',
-        title: `${eq.id} — Critical Health`, detail: `Health at ${h}% · ${eq.location ?? '—'}` });
-    } else if (h < 70) {
-      alerts.push({ id: `eq-warn-${eq.id}`, severity: 'MEDIUM', category: 'Equipment',
-        title: `${eq.id} — Health Warning`, detail: `Health at ${h}% · ${eq.location ?? '—'}` });
-    }
-  });
-
-  (fuelMetrics || []).forEach((fm, idx) => {
-    const site = fm.site ?? fm.location ?? `Site ${idx + 1}`;
-    const eff  = fm.fuelEfficiency ?? null;
-    if (eff !== null && eff < 70) {
-      alerts.push({ id: `fuel-crit-${fm.id ?? idx}`, severity: 'CRITICAL', category: 'Fuel',
-        title: `Fuel Efficiency Critical — ${site}`, detail: `Efficiency at ${eff}%` });
-    } else if (eff !== null && eff < 80) {
-      alerts.push({ id: `fuel-warn-${fm.id ?? idx}`, severity: 'MEDIUM', category: 'Fuel',
-        title: `Fuel Efficiency Below Target — ${site}`, detail: `Efficiency at ${eff}%` });
-    }
-    if (eff === null && fm.status === 'Investigating') {
-      alerts.push({ id: `fuel-status-${fm.id ?? idx}`, severity: 'HIGH', category: 'Fuel',
-        title: `Fuel Anomaly — ${site}`, detail: `Status: Under Investigation · ${fm.amount ?? '—'}` });
-    }
-  });
-
-  (incidents || []).forEach(inc => {
-    const sev = (inc.severity ?? '').toLowerCase();
-    if (sev === 'danger' || sev === 'critical' || sev === 'high') {
-      alerts.push({ id: `safe-${inc.id}`, severity: 'CRITICAL', category: 'Safety',
-        title: `${inc.type ?? 'Safety Incident'} — ${inc.location ?? '—'}`, detail: `${inc.id} · Status: ${inc.status ?? '—'}` });
-    }
-  });
-
-  (events || [])
-    .filter(e => e.severity === 'danger' && ['anomaly','maintenance','safety'].includes(e.type))
-    .slice(0, 3)
-    .forEach(ev => {
-      alerts.push({ id: `ops-${ev.id}`, severity: 'HIGH', category: 'Ops Event',
-        title: 'High Priority Operational Event',
-        detail: ev.message?.slice(0, 90) + (ev.message?.length > 90 ? '…' : '') || 'Critical event detected' });
-    });
-
-  const seen = new Set();
-  return alerts
-    .filter(a => { if (seen.has(a.id)) return false; seen.add(a.id); return true; })
-    .sort((a, b) => (SEV[b.severity]?.rank ?? 0) - (SEV[a.severity]?.rank ?? 0));
-}
+// evaluateThresholds diimpor dari src/utils/thresholds.js
 
 // ── Derive recommended handover actions from data ────────────────────────────
 function deriveRecommendations(alerts, equipment, incidents) {
@@ -296,7 +245,7 @@ export default function ShiftHandover() {
             fontFamily: 'var(--font-mono)', fontSize: '0.6rem', fontWeight: 600,
             letterSpacing: '0.14em', color: 'var(--amber)', marginBottom: '4px',
           }}>
-            SMART MINING OPERATIONS PLATFORM
+            STRATA — Smart Tactical Resource & Analytics Platform
           </div>
           <h1 style={{
             fontFamily: 'var(--font-ui)', fontSize: '1.35rem', fontWeight: 700,

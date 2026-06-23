@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import './styles/responsive.css';
 
 @tailwind base;
 @tailwind components;
@@ -76,6 +77,18 @@ body {
 .panel-elevated {
   background: var(--bg-elevated);
   border: 1px solid var(--border-hard);
+}
+
+/* ── Legacy utility aliases (referenced by existing components) ── */
+.glass-panel {
+  background: rgba(17, 20, 24, 0.75);
+  border: 1px solid var(--border-hard);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.glow-orange {
+  box-shadow: 0 0 0 1px var(--orange-edge), 0 4px 24px rgba(232,96,10,0.12);
 }
 
 /* ── Status left-border pattern ───────────────────────── */

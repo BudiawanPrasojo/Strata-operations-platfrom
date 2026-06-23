@@ -282,7 +282,7 @@ export default function TacticalMiningMap() {
         }}
       >
         <div className="flex items-center gap-4">
-          <span className="text-[10px] tracking-wider" style={{ color: 'var(--ink-muted)' }}>SMOP · REAL-TIME DATA FEED</span>
+          <span className="text-[10px] tracking-wider" style={{ color: 'var(--ink-muted)' }}>STRATA · REAL-TIME DATA FEED</span>
           <div className="hidden sm:flex items-center gap-3">
             {[
               { label: 'UNITS', val: '6', color: 'var(--orange)' },

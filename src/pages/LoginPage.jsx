@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { Activity, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import SMOPLogo from '../components/common/SMOPLogo';
+import STRATALogo from '../components/common/STRATALogo';
 
 export default function LoginPage() {
   const { signIn, isAuthenticated, loading } = useAuth();

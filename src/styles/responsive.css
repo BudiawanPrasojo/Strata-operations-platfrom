@@ -1,0 +1,248 @@
+/*
+ * responsive.css — STRATA Responsive Audit (Sprint 4)
+ *
+ * Breakpoints:
+ *   Mobile  < 640px
+ *   Tablet  640px – 1023px
+ *   Desktop ≥ 1024px
+ *
+ * Strategy:
+ *   - All page-level layout uses CSS class hooks (.page-header,
+ *     .kpi-summary-grid, .shift-stats-grid, .shift-equipment-grid)
+ *   - Inline styles that are fixed-width get overridden here at
+ *     smaller viewports so no layout component needs to be rewritten.
+ *   - Tables receive horizontal scroll on narrow viewports.
+ *   - Navigation sidebar collapses to bottom nav on mobile.
+ */
+
+/* ── Layout shell ────────────────────────────────────────────────────────────*/
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar: full-height on desktop, bottom bar on mobile */
+@media (max-width: 639px) {
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    height: 56px;
+    flex-direction: row;
+    z-index: 100;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-top: 1px solid var(--border-hard);
+    border-right: none;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    width: 100%;
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar-nav-item {
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 10px;
+    min-width: 60px;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    white-space: nowrap;
+  }
+
+  .sidebar-logo {
+    display: none;
+  }
+
+  /* Push main content above bottom bar */
+  .main-content {
+    padding-bottom: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+}
+
+/* ── Page header ─────────────────────────────────────────────────────────────*/
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 639px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .page-header-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .page-header-actions button {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.75rem;
+  }
+}
+
+/* ── KPI Summary Grid (Dashboard + Analytics) ────────────────────────────────*/
+
+.kpi-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1023px) {
+  .kpi-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 479px) {
+  .kpi-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Alert Panel Summary Bar (3-col on desktop) ──────────────────────────────*/
+
+.alert-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 479px) {
+  .alert-summary-bar {
+    grid-template-columns: repeat(3, minmax(72px, 1fr));
+    overflow-x: auto;
+  }
+}
+
+/* ── Shift Handover stats grid (2-col) ───────────────────────────────────────*/
+
+.shift-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 479px) {
+  .shift-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Shift equipment/incidents grid (3-col) ──────────────────────────────────*/
+
+.shift-equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+}
+
+@media (max-width: 767px) {
+  .shift-equipment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 479px) {
+  .shift-equipment-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Data tables — horizontal scroll on narrow viewports ─────────────────────*/
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  min-width: 560px;
+}
+
+/* ── Tactical Map ─────────────────────────────────────────────────────────────*/
+
+@media (max-width: 639px) {
+  .tactical-map-container {
+    height: 260px;
+  }
+
+  .tactical-map-sidebar {
+    max-height: 240px;
+    overflow-y: auto;
+  }
+}
+
+/* ── Panel cards ─────────────────────────────────────────────────────────────*/
+
+@media (max-width: 639px) {
+  .panel {
+    border-radius: 4px;
+  }
+
+  .panel-header {
+    padding: 10px 12px;
+  }
+
+  .panel-body {
+    padding: 10px 12px;
+  }
+}
+
+/* ── Typography scale ────────────────────────────────────────────────────────*/
+
+@media (max-width: 479px) {
+  .page-title {
+    font-size: 1.1rem;
+  }
+
+  .metric-value-lg {
+    font-size: 1.4rem;
+  }
+}
+
+/* ── Utility: truncate long text gracefully ──────────────────────────────────*/
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* ── Touch targets — minimum 44 × 44 px on mobile ───────────────────────────*/
+
+@media (max-width: 767px) {
+  button,
+  [role='button'],
+  a {
+    min-height: 40px;
+  }
+}

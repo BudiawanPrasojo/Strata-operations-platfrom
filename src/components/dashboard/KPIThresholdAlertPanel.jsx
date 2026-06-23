@@ -1,7 +1,7 @@
 /**
  * KPIThresholdAlertPanel.jsx
  *
- * Menampilkan alert aktif berdasarkan threshold KPI dari data operasional.
+ * Displays active KPI threshold alerts derived from operational data.
  *
  * Data sources (existing hooks, no new tables):
  *   - useEquipment      → equipment health threshold
@@ -24,6 +24,7 @@ import { useSafety }             from '../../hooks/useSafety';
 import { useOperationalEvents }  from '../../hooks/useOperationalEvents';
 import LoadingSkeleton           from '../common/LoadingSkeleton';
 import ErrorState                from '../common/ErrorState';
+import { evaluateThresholds }    from '../../utils/thresholds';
 
 // ── Severity config (consistent with TacticalAlertCenter design system) ──────
 const SEV = {
@@ -60,123 +61,6 @@ const SOURCE_TAG = {
   safety:    { label: 'SAFETY',    color: 'var(--alert)' },
   ops:       { label: 'OPS EVENT', color: '#f97316'       },
 };
-
-// ── Threshold evaluation — pure, deterministic ────────────────────────────────
-function evaluateThresholds(equipment, fuelMetrics, incidents, events) {
-  const alerts = [];
-
-  // 1. Equipment health
-  (equipment || []).forEach(eq => {
-    const h = eq.health ?? 100;
-    if (h < 50) {
-      alerts.push({
-        id:       `equip-crit-${eq.id}`,
-        severity: 'CRITICAL',
-        source:   'equipment',
-        icon:     Truck,
-        title:    `${eq.id} — Critical Health Degradation`,
-        detail:   `Health at ${h}% — below critical threshold (50%). Immediate inspection required. Location: ${eq.location ?? '—'}.`,
-        meta:     `${eq.type ?? 'Equipment'} · ${eq.location ?? '—'}`,
-      });
-    } else if (h < 70) {
-      alerts.push({
-        id:       `equip-warn-${eq.id}`,
-        severity: 'MEDIUM',
-        source:   'equipment',
-        icon:     Truck,
-        title:    `${eq.id} — Health Below Warning Threshold`,
-        detail:   `Health at ${h}% — below warning threshold (70%). Schedule preventive maintenance. Location: ${eq.location ?? '—'}.`,
-        meta:     `${eq.type ?? 'Equipment'} · ${eq.location ?? '—'}`,
-      });
-    }
-  });
-
-  // 2. Fuel anomalies
-  (fuelMetrics || []).forEach((fm, idx) => {
-    const site = fm.site ?? fm.location ?? `Site ${idx + 1}`;
-
-    // Fuel efficiency threshold (Supabase data)
-    const eff = fm.fuelEfficiency ?? null;
-    if (eff !== null) {
-      if (eff < 70) {
-        alerts.push({
-          id:       `fuel-crit-${fm.id ?? idx}`,
-          severity: 'CRITICAL',
-          source:   'fuel',
-          icon:     Fuel,
-          title:    `Fuel Efficiency Critical — ${site}`,
-          detail:   `Efficiency at ${eff}% — below critical threshold (70%). Possible equipment fault or unauthorized consumption. Immediate review required.`,
-          meta:     `${site} · ${fm.timestamp ? new Date(fm.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '—'}`,
-        });
-      } else if (eff < 80) {
-        alerts.push({
-          id:       `fuel-warn-${fm.id ?? idx}`,
-          severity: 'MEDIUM',
-          source:   'fuel',
-          icon:     Fuel,
-          title:    `Fuel Efficiency Below Target — ${site}`,
-          detail:   `Efficiency at ${eff}% — below warning threshold (80%). Review haul routes and equipment calibration.`,
-          meta:     `${site} · ${fm.timestamp ? new Date(fm.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '—'}`,
-        });
-      }
-    }
-
-    // Fallback: status-based detection (mock data / no efficiency field)
-    if (eff === null && fm.status === 'Investigating') {
-      alerts.push({
-        id:       `fuel-status-${fm.id ?? idx}`,
-        severity: 'HIGH',
-        source:   'fuel',
-        icon:     Fuel,
-        title:    `Fuel Anomaly Under Investigation — ${site}`,
-        detail:   `Suspicious fuel consumption flagged at ${site}. Amount: ${fm.amount ?? '—'}. Status: Under investigation.`,
-        meta:     `${site} · ${fm.time ?? '—'}`,
-      });
-    }
-  });
-
-  // 3. Safety incidents
-  (incidents || []).forEach(inc => {
-    const sev = (inc.severity ?? '').toLowerCase();
-    if (sev === 'danger' || sev === 'critical' || sev === 'high') {
-      alerts.push({
-        id:       `safety-crit-${inc.id}`,
-        severity: 'CRITICAL',
-        source:   'safety',
-        icon:     ShieldAlert,
-        title:    `Safety Incident — ${inc.type ?? 'Incident'}`,
-        detail:   `Severity: ${inc.severity}. Location: ${inc.location ?? '—'}. Status: ${inc.status ?? 'Under Review'}. Immediate response required.`,
-        meta:     `${inc.id} · ${inc.date ?? '—'}`,
-      });
-    }
-  });
-
-  // 4. Operational events — danger severity
-  const criticalEventTypes = ['anomaly', 'maintenance', 'safety'];
-  (events || [])
-    .filter(e =>
-      e.severity === 'danger' &&
-      criticalEventTypes.includes(e.type)
-    )
-    .slice(0, 3) // cap to avoid flooding panel with events
-    .forEach(ev => {
-      alerts.push({
-        id:       `ops-${ev.id}`,
-        severity: 'HIGH',
-        source:   'ops',
-        icon:     Radio,
-        title:    `High Priority Operational Event`,
-        detail:   ev.message?.slice(0, 120) + (ev.message?.length > 120 ? '…' : '') || 'Critical operational event detected.',
-        meta:     `${ev.type?.toUpperCase() ?? 'EVENT'} · ${ev.sector ?? ev.timestamp ?? '—'}`,
-      });
-    });
-
-  // Sort by rank descending, deduplicate by id
-  const seen = new Set();
-  return alerts
-    .filter(a => { if (seen.has(a.id)) return false; seen.add(a.id); return true; })
-    .sort((a, b) => (SEV[b.severity]?.rank ?? 0) - (SEV[a.severity]?.rank ?? 0));
-}
 
 // ── Single alert row ──────────────────────────────────────────────────────────
 function AlertRow({ alert }) {

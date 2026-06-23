@@ -7,12 +7,43 @@
  * Aturan sumber data (tidak boleh bercampur):
  *   - Supabase berhasil → tampilkan HANYA data Supabase, source='supabase'
  *   - Supabase gagal / tidak terkonfigurasi → tampilkan HANYA mockData, source='mock'
+ *
+ * @module useFuel
  */
 
 import { useState, useEffect } from 'react';
 import { supabase, supabaseConfigured } from '../services/supabase';
 import { fuelIntelligence } from '../data/mockData';
 
+/**
+ * @typedef {Object} FuelMetricRecord
+ * @property {number}      id              - ID record (dari Supabase) atau index (mock)
+ * @property {string}      site            - Nama site / lokasi
+ * @property {number}      fuelConsumption - Konsumsi bahan bakar dalam liter
+ * @property {number}      fuelEfficiency  - Efisiensi dalam persen (0–100)
+ * @property {number}      fuelCost        - Biaya bahan bakar (nilai moneter)
+ * @property {string}      status          - "Normal" | "Investigating" | "Critical" | "Resolved"
+ * @property {string}      timestamp       - ISO timestamp record
+ * @property {string}      location        - Alias untuk `site` (kompatibilitas UI)
+ * @property {string}      amount          - Display string konsumsi (misal: "8423L")
+ * @property {string}      time            - Display string waktu (misal: "14:32")
+ */
+
+/**
+ * @typedef {Object} UseFuelResult
+ * @property {FuelMetricRecord[]}    fuelMetrics - Daftar data fuel metrics
+ * @property {boolean}               loading     - true selama fetch berlangsung
+ * @property {string|null}           error       - Pesan error, null jika tidak ada
+ * @property {'supabase'|'mock'}     source      - Sumber data aktif
+ * @property {() => void}            refetch     - Fungsi untuk memicu ulang fetch
+ */
+
+/**
+ * Hook untuk mengambil data fuel metrics dari Supabase.
+ * Otomatis fallback ke mockData jika Supabase tidak dikonfigurasi atau fetch gagal.
+ *
+ * @returns {UseFuelResult}
+ */
 export function useFuel() {
   const [fuelMetrics, setFuelMetrics] = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -62,7 +93,6 @@ export function useFuel() {
             : '-',
         }));
 
-        // Supabase berhasil → set HANYA data Supabase, bersihkan state sebelumnya
         setFuelMetrics(mapped);
         setSource('supabase');
         setError(null);
@@ -84,7 +114,7 @@ export function useFuel() {
     return () => { cancelled = true; };
   }, [refetchKey]); // refetchKey sebagai trigger — jalan ulang setiap refetch dipanggil
 
-  // refetch: increment key untuk memicu useEffect ulang dengan fetch baru
+  /** Memicu ulang fetch fuel metrics dari awal. */
   const refetch = () => setRefetchKey(k => k + 1);
 
   return { fuelMetrics, loading, error, source, refetch };

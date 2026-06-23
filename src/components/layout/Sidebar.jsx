@@ -94,7 +94,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                 color: 'var(--ink-primary)',
                 lineHeight: 1,
               }}>
-                SMART MINING
+                STRATA
               </div>
               <div style={{
                 fontFamily: 'var(--font-mono)',
@@ -103,7 +103,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                 color: 'var(--ink-muted)',
                 marginTop: '2px',
               }}>
-                OPS PLATFORM v2
+                Tactical Ops
               </div>
             </div>
           )}
@@ -227,7 +227,6 @@ export default function Sidebar({ collapsed, onToggle }) {
           className="hidden lg:flex items-center justify-center"
           style={{
             height: '36px',
-            borderTop: '1px solid var(--border-hard)',
             background: 'transparent',
             border: 'none',
             borderTop: '1px solid var(--border-hard)',

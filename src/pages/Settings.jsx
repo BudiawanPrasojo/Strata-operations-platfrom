@@ -193,7 +193,7 @@ export default function Settings() {
         <CardHeader title="System Information" icon={Database} />
         <div className="space-y-2">
           {[
-            { label: 'Platform Version', value: 'SMOP v2.4.1'          },
+            { label: 'Platform Version', value: 'STRATA v2.4.1'          },
             { label: 'API Status',       value: 'Connected'             },
             { label: 'Data Sync',        value: 'Real-time'             },
             { label: 'Last Backup',      value: '2024-01-15 06:00 UTC'  },

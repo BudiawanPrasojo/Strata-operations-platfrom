@@ -36,7 +36,7 @@ export default function Dashboard() {
             color: 'var(--amber)',
             marginBottom: '4px',
           }}>
-            SMART MINING OPERATIONS PLATFORM
+            STRATA — Smart Tactical Resource & Analytics Platform
           </div>
           <h1 style={{
             fontFamily: 'var(--font-ui)',

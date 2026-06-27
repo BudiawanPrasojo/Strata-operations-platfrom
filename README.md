@@ -1,8 +1,7 @@
 # STRATA — Smart Tactical Resource & Analytics Platform
 
 > Production-grade mining operations intelligence dashboard.  
-> Real-time equipment telemetry · Fuel anomaly detection · Safety incident tracking · AI-powered shift handover.
-
+> Real-time equipment telemetry · Fuel anomaly detection · Safety incident tracking · Data-driven Operational Insights.
 <div align="center">
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://strata-operations-platfrom.vercel.app)

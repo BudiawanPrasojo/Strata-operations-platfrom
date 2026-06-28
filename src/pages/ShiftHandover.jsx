@@ -18,7 +18,7 @@ import {
   ClipboardList, Users, Clock, Truck, ShieldAlert,
   Bell, AlertTriangle, CheckCircle2, AlertCircle,
   Zap, Radio, Fuel, ChevronRight, Activity,
-  TrendingDown, WrenchIcon,
+  TrendingDown, WrenchIcon, Printer, Download,
 } from 'lucide-react';
 
 import { useEquipment }         from '../hooks/useEquipment';
@@ -27,6 +27,7 @@ import { useSafety }            from '../hooks/useSafety';
 import { useOperationalEvents } from '../hooks/useOperationalEvents';
 import { operationsData }       from '../data/mockData';
 import { evaluateThresholds }   from '../utils/thresholds';
+import { exportToCSV }          from '../utils/exportCSV';
 
 import LoadingSkeleton from '../components/common/LoadingSkeleton';
 import ErrorState      from '../components/common/ErrorState';
@@ -266,6 +267,53 @@ export default function ShiftHandover() {
             <div className="live-dot" style={{ width: '5px', height: '5px', background: 'var(--amber)' }} />
             HANDOVER READY
           </span>
+          {/* Export CSV */}
+          <button
+            onClick={() => {
+              const rows = alerts.map(a => ({
+                'Alert ID':    a.id,
+                'Category':    a.category,
+                'Severity':    a.severity,
+                'Title':       a.title,
+                'Detail':      a.detail,
+              }));
+              exportToCSV(rows.length > 0 ? rows : [{ note: 'No active alerts' }], 'strata-shift-handover');
+            }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '5px 10px',
+              fontSize: '0.65rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em',
+              background: 'transparent',
+              border: '1px solid var(--border-hard)',
+              color: 'var(--ink-muted)',
+              borderRadius: '4px', cursor: 'pointer',
+              transition: 'border-color 0.15s, color 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--amber)'; e.currentTarget.style.color = 'var(--amber)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-hard)'; e.currentTarget.style.color = 'var(--ink-muted)'; }}
+          >
+            <Download size={11} />
+            Export CSV
+          </button>
+          {/* Print */}
+          <button
+            onClick={() => window.print()}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '5px 10px',
+              fontSize: '0.65rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em',
+              background: 'rgba(245,158,11,0.08)',
+              border: '1px solid rgba(245,158,11,0.25)',
+              color: 'var(--amber)',
+              borderRadius: '4px', cursor: 'pointer',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(245,158,11,0.16)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(245,158,11,0.08)'; }}
+          >
+            <Printer size={11} />
+            Print
+          </button>
         </div>
       </div>
 

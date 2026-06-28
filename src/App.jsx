@@ -3,9 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import PageLoader from './components/common/PageLoader';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // ── Eager load: auth route (perlu cepat, tidak di-lazy) ──────────────────────
 import LoginPage from './pages/LoginPage';
+import NotFound  from './pages/NotFound';
 
 // ── Lazy load: semua page di dalam protected layout ───────────────────────────
 const Dashboard              = lazy(() => import('./pages/Dashboard'));
@@ -29,7 +31,7 @@ export default function App() {
 
         {/* Protected routes — semua page di-lazy untuk code splitting */}
         <Route element={<ProtectedRoute />}>
-          <Route element={<Layout />}>
+          <Route element={<ErrorBoundary><Layout /></ErrorBoundary>}>
             <Route
               path="/"
               element={
@@ -120,6 +122,9 @@ export default function App() {
             />
           </Route>
         </Route>
+
+        {/* 404 — catch-all untuk URL yang tidak dikenali */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

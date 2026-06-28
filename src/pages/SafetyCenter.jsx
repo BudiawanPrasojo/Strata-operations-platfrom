@@ -1,10 +1,26 @@
-import { ShieldCheck, AlertTriangle, Users, Clock, MapPin, FileText, Activity, Database } from 'lucide-react';
+import { useState } from 'react';
+import { ShieldCheck, AlertTriangle, Users, Clock, MapPin, FileText, Activity, Database, Download, Filter } from 'lucide-react';
 import Card, { CardHeader } from '../components/common/Card';
 import StatusBadge from '../components/common/StatusBadge';
 import LoadingSkeleton from '../components/common/LoadingSkeleton';
 import ErrorState from '../components/common/ErrorState';
 import { safetyData } from '../data/mockData';
 import { useSafety } from '../hooks/useSafety';
+import { exportToCSV } from '../utils/exportCSV';
+
+const SEVERITY_FILTERS = ['All', 'High', 'Medium', 'Low'];
+
+function exportIncidentsCSV(data) {
+  const mapped = data.map(inc => ({
+    'Incident ID':  inc.id,
+    'Date':         inc.date,
+    'Type':         inc.type,
+    'Severity':     inc.severity,
+    'Location':     inc.location,
+    'Status':       inc.status,
+  }));
+  exportToCSV(mapped, 'strata-safety-incidents');
+}
 
 function MetricRing({ value, max = 100, label, color }) {
   const safeValue = Number(value) || 0;
@@ -43,6 +59,11 @@ const fatigueColors = {
 
 export default function SafetyCenter() {
   const { incidents, loading, error, source, refetch } = useSafety();
+  const [severityFilter, setSeverityFilter] = useState('All');
+
+  const filteredIncidents = severityFilter === 'All'
+    ? incidents
+    : incidents.filter(inc => inc.severity === severityFilter);
 
   return (
     <div className="space-y-6">
@@ -215,7 +236,38 @@ export default function SafetyCenter() {
 
       {/* Incident History — dari useSafety hook (Supabase + fallback mock) */}
       <Card>
-        <CardHeader title="Recent Incidents" subtitle="Last 30 days" icon={FileText} />
+        {/* Header row with filter + export */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <CardHeader title="Recent Incidents" subtitle="Last 30 days" icon={FileText} />
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Severity filter */}
+            <div className="flex items-center gap-1">
+              <Filter size={12} className="text-graphite-500" />
+              {SEVERITY_FILTERS.map(f => (
+                <button
+                  key={f}
+                  onClick={() => setSeverityFilter(f)}
+                  className={`px-2 py-0.5 text-[10px] font-mono rounded transition-colors ${
+                    severityFilter === f
+                      ? 'bg-industrial-500 text-void-950 font-bold'
+                      : 'border border-graphite-700/50 text-graphite-400 hover:border-graphite-500 hover:text-graphite-200'
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+            {/* Export button */}
+            <button
+              onClick={() => exportIncidentsCSV(filteredIncidents)}
+              disabled={filteredIncidents.length === 0}
+              className="flex items-center gap-1.5 px-3 py-1 text-[10px] font-mono tracking-wider border border-graphite-700/50 text-graphite-400 rounded hover:border-industrial-500/60 hover:text-industrial-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Download size={11} />
+              Export CSV
+            </button>
+          </div>
+        </div>
 
         {/* Loading state */}
         {loading && (
@@ -235,14 +287,18 @@ export default function SafetyCenter() {
         )}
 
         {/* Empty state */}
-        {!loading && !error && incidents.length === 0 && (
+        {!loading && !error && filteredIncidents.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-sm text-graphite-500">No incidents recorded in the last 30 days.</p>
+            <p className="text-sm text-graphite-500">
+              {severityFilter === 'All'
+                ? 'No incidents recorded in the last 30 days.'
+                : `No ${severityFilter} severity incidents found.`}
+            </p>
           </div>
         )}
 
-        {/* Incident table — render kalau ada data */}
-        {!loading && !error && incidents.length > 0 && (
+        {/* Incident table */}
+        {!loading && !error && filteredIncidents.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -253,7 +309,7 @@ export default function SafetyCenter() {
                 </tr>
               </thead>
               <tbody>
-                {incidents.map((inc) => (
+                {filteredIncidents.map((inc) => (
                   <tr key={inc.id} className="border-b border-graphite-800/30 hover:bg-graphite-800/20 transition-colors">
                     <td className="py-3 px-4 font-mono text-xs text-industrial-400">{inc.id}</td>
                     <td className="py-3 px-4 text-graphite-400 text-xs">{inc.date}</td>

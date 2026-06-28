@@ -42,7 +42,7 @@ export default function AIInsights() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-gradient">AI Operational Insights</h1>
+          <h1 className="text-xl lg:text-2xl font-bold text-gradient">Operational Intelligence</h1>
           <p className="text-sm text-graphite-400 mt-1">Machine learning-powered operational intelligence</p>
         </div>
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-industrial-500/10 border border-industrial-500/20">

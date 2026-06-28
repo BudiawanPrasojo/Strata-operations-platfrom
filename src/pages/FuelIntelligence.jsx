@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { TrendingDown, AlertTriangle, Route, Search, Gauge, BarChart3, Droplets, Database } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -51,6 +52,7 @@ function ScoreRing({ value, label, size = 80 }) {
 
 export default function FuelIntelligence() {
   const { fuelMetrics, loading, error, source, refetch } = useFuel();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const chartOptions = {
     responsive: true,
@@ -205,7 +207,28 @@ export default function FuelIntelligence() {
 
       {/* Anomaly Detection */}
       <Card>
-        <CardHeader title="Fuel Anomaly Detection" subtitle="Suspicious fuel loss monitoring" icon={Search} />
+        {/* Header + search bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <CardHeader title="Fuel Anomaly Detection" subtitle="Suspicious fuel loss monitoring" icon={Search} />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-graphite-700/50 bg-graphite-800/20 min-w-[180px]">
+            <Search size={12} className="text-graphite-500 shrink-0" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search location..."
+              className="bg-transparent text-xs text-graphite-200 placeholder-graphite-500 outline-none w-full font-mono"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-graphite-500 hover:text-graphite-300 transition-colors text-xs leading-none"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Loading state */}
         {loading && (
@@ -231,40 +254,54 @@ export default function FuelIntelligence() {
           </div>
         )}
 
-        {/* Anomaly table — render kalau tidak loading, tidak error, dan ada data */}
-        {!loading && !error && fuelMetrics.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-graphite-700/50">
-                <th className="text-left py-3 px-4 text-xs font-medium text-graphite-500 uppercase tracking-wider">Location</th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-graphite-500 uppercase tracking-wider">Amount</th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-graphite-500 uppercase tracking-wider">Time</th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-graphite-500 uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fuelMetrics.map((item, i) => (
-                <tr key={item.id ?? i} className="border-b border-graphite-800/30 hover:bg-graphite-800/20 transition-colors">
-                  <td className="py-3 px-4 font-medium text-graphite-200">{item.location}</td>
-                  <td className="py-3 px-4 text-danger font-mono">{item.amount}</td>
-                  <td className="py-3 px-4 text-graphite-400 font-mono text-xs">{item.time}</td>
-                  <td className="py-3 px-4">
-                    <span className={`text-xs font-medium ${item.status === 'Investigating' ? 'text-warning' : 'text-success'}`}>
-                      {item.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        )}
+        {/* Anomaly table — dengan search filter */}
+        {!loading && !error && fuelMetrics.length > 0 && (() => {
+          const q = searchQuery.toLowerCase().trim();
+          const filtered = q
+            ? fuelMetrics.filter(item =>
+                item.location?.toLowerCase().includes(q) ||
+                item.status?.toLowerCase().includes(q) ||
+                item.amount?.toLowerCase().includes(q)
+              )
+            : fuelMetrics;
+
+          return filtered.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-sm text-graphite-500">No results for "{searchQuery}".</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-graphite-700/50">
+                    {['Location', 'Amount', 'Time', 'Status'].map(h => (
+                      <th key={h} className="text-left py-3 px-4 text-xs font-medium text-graphite-500 uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((item, i) => (
+                    <tr key={item.id ?? i} className="border-b border-graphite-800/30 hover:bg-graphite-800/20 transition-colors">
+                      <td className="py-3 px-4 font-medium text-graphite-200">{item.location}</td>
+                      <td className="py-3 px-4 text-danger font-mono">{item.amount}</td>
+                      <td className="py-3 px-4 text-graphite-400 font-mono text-xs">{item.time}</td>
+                      <td className="py-3 px-4">
+                        <span className={`text-xs font-medium ${item.status === 'Investigating' ? 'text-warning' : 'text-success'}`}>
+                          {item.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })()}
       </Card>
 
       {/* Route Fuel Optimization */}
       <Card>
-        <CardHeader title="Route Fuel Optimization" subtitle="AI-recommended route adjustments" icon={Route} />
+        <CardHeader title="Route Fuel Optimization" subtitle="Threshold-based route efficiency analysis" icon={Route} />
         <div className="space-y-3">
           {[
             { route: 'Route Alpha', current: '42L/trip', optimized: '37L/trip', saving: '12%', status: 'Recommended' },

@@ -29,16 +29,33 @@ To connect your own Supabase instance, see [Environment Setup](#environment-setu
 
 ## Screenshots
 
-> Live demo: **[strata-operations-platfrom.vercel.app](https://strata-operations-platfrom.vercel.app)**  
-> Screenshots akan ditambahkan setelah final deployment. Lihat live demo untuk tampilan lengkap.
+> **Live Demo:** **[strata-operations-platfrom.vercel.app](https://strata-operations-platfrom.vercel.app)**  
+> Login dengan `demo@strata.io` / `demo1234` — berjalan di atas mock data, tanpa setup.
 
-| Page | Description |
+<!-- 
+  CARA MENAMBAHKAN SCREENSHOTS:
+  1. Buka live demo, screenshot setiap halaman (fullscreen, dark mode)
+  2. Simpan di docs/screenshots/ dengan nama:
+       dashboard.png, tactical-map.png, fuel-intelligence.png,
+       safety-center.png, shift-handover.png
+  3. Uncomment blok di bawah ini
+
+![Dashboard](./docs/screenshots/dashboard.png)
+![Tactical Map](./docs/screenshots/tactical-map.png)
+![Fuel Intelligence](./docs/screenshots/fuel-intelligence.png)
+![Safety Center](./docs/screenshots/safety-center.png)
+![Shift Handover](./docs/screenshots/shift-handover.png)
+-->
+
+| Page | Fitur Utama |
 |---|---|
-| **Dashboard** | KPI cards, tactical map, live feed, domino-effect alerts |
-| **Tactical Map** | Real-time equipment position & zone status (SVG) |
+| **Dashboard** | KPI cards, tactical map, live feed, domino-effect alert engine |
+| **Tactical Map** | Real-time equipment position & zone status (SVG canvas) |
 | **Fuel Intelligence** | Anomaly detection, consumption heatmap, route optimizer |
-| **Safety Center** | Incident tracker, compliance overview, worker log |
-| **Shift Handover** | Structured changeover summary with threshold alerts |
+| **Safety Center** | Incident tracker, severity ranking, compliance overview |
+| **Shift Handover** | Structured changeover summary dengan threshold alert panel |
+| **Operational Intelligence** | Rule-based pattern detection, decision impact simulator |
+| **Analytics** | OEE trend, production volume, fuel efficiency charts |
 
 ---
 
